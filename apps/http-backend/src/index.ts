@@ -55,7 +55,7 @@ app.post("/signup", async(req, res) => {
 
       console.error("Signup error:", error);
       res.status(500).json({
-        message: "Internal server error",
+        message: "Incorrect Inputs",
       });
       return;
     }
