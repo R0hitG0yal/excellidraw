@@ -119,7 +119,7 @@ app.post("/signin", async (req: Request, res: Response) => {
   }
 });
 
-app.post('/room', middleware,async (req, res) => {
+app.post('/room', middleware ,(req, res) => {
 
     //db call
     res.json({roomId: 123});
