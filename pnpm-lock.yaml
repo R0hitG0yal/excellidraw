@@ -20,6 +20,9 @@ importers:
 
   apps/http-backend:
     dependencies:
+      '@prisma/client':
+        specifier: 6.3.0
+        version: 6.3.0(prisma@6.3.0(typescript@5.5.4))(typescript@5.5.4)
       '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
@@ -42,6 +45,9 @@ importers:
       '@repo/backend-common':
         specifier: workspace:*
         version: link:../../packages/backend-common
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
 
   apps/web:
     dependencies:
