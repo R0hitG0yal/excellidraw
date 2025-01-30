@@ -76,7 +76,7 @@ app.post("/signin", async (req: Request, res: Response) => {
 
     // TODO: Generate and send JWT token here if using token-based auth
     const userId = user.id;
-    const token = await jwt.sign({userID},JWT_SECRET);
+    const token = await jwt.sign({userId},JWT_SECRET);
 
     res.status(200).json({
       message: "Signin successful",

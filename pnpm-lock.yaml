@@ -126,6 +126,10 @@ importers:
         version: link:../typescript-config
 
   packages/db:
+    dependencies:
+      '@prisma/client':
+        specifier: 6.3.0
+        version: 6.3.0(prisma@6.3.0(typescript@5.5.4))(typescript@5.5.4)
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -457,6 +461,18 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@prisma/client@6.3.0':
+    resolution: {integrity: sha512-BY3Fi28PUSk447Bpv22LhZp4HgNPo7NsEN+EteM1CLDnLjig5863jpW+3c3HHLFmml+nB/eJv1CjSriFZ8z7Cg==}
+    engines: {node: '>=18.18'}
+    peerDependencies:
+      prisma: '*'
+      typescript: '>=5.1.0'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+      typescript:
+        optional: true
 
   '@prisma/debug@6.3.0':
     resolution: {integrity: sha512-m1lQv//0Rc5RG8TBpNUuLCxC35Ghi5XfpPmL83Gh04/GICHD2J5H2ndMlaljrUNaQDF9dOxIuFAYP1rE9wkXkg==}
@@ -2614,6 +2630,11 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
+
+  '@prisma/client@6.3.0(prisma@6.3.0(typescript@5.5.4))(typescript@5.5.4)':
+    optionalDependencies:
+      prisma: 6.3.0(typescript@5.5.4)
+      typescript: 5.5.4
 
   '@prisma/debug@6.3.0': {}
 
