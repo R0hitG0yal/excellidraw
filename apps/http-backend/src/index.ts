@@ -1,64 +1,68 @@
-import { compare, hash } from 'bcrypt';
-import express,{Request, Response} from 'express';
-import {z} from 'zod';
-import jwt from 'jsonwebtoken';
-import { middleware } from './middleware';
-import { JWT_SECRET } from '@repo/backend-common/config';
-import { CreateUserSchema, SigninSchema } from "@repo/common/types"; 
+import { compare, hash } from "bcrypt";
+import express, { Request, Response } from "express";
+import { z, ZodError } from "zod";
+import jwt from "jsonwebtoken";
+import { middleware } from "./middleware";
+import { JWT_SECRET } from "@repo/backend-common/config";
+import {
+  CreateUserSchema,
+  SigninSchema,
+  CreateRoomSchema,
+} from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
 
-const app= express();
+const app = express();
 app.use(express.json());
 
-app.post("/signup", async(req, res) => {
-    try {
-      const validatedData = CreateUserSchema.parse(req.body);
+app.post("/signup", async (req, res) => {
+  try {
+    const validatedData = CreateUserSchema.parse(req.body);
 
-      // Check if user already exists
-      const existingUser = await prismaClient.user.findFirst({
-        where: { username: validatedData.username },
-      });
+    // Check if user already exists
+    const existingUser = await prismaClient.user.findFirst({
+      where: { username: validatedData.username },
+    });
 
-      if (existingUser) {
-        res.status(409).json({
-          message: "Username already exists",
-        });
-        return;
-      }
-
-      const hashedPass = await hash(validatedData.password, 10);
-
-      //save user to db
-      const user = {
-        ...validatedData,
-        password: hashedPass,
-      };
-
-      const saved = await prismaClient.user.create({ data: user });
-
-      res.status(200).json({
-        message: "User created successfully",
-        user: {
-          username: saved.username,
-          name: saved.name,
-        },
-      });
-      return;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({
-          message: "Validation failed",
-          errors: error.errors,
-        });
-        return;
-      }
-
-      console.error("Signup error:", error);
-      res.status(500).json({
-        message: "Incorrect Inputs",
+    if (existingUser) {
+      res.status(409).json({
+        message: "Username already exists",
       });
       return;
     }
+
+    const hashedPass = await hash(validatedData.password, 10);
+
+    //save user to db
+    const user = {
+      ...validatedData,
+      password: hashedPass,
+    };
+
+    const saved = await prismaClient.user.create({ data: user });
+
+    res.status(200).json({
+      message: "User created successfully",
+      user: {
+        username: saved.username,
+        name: saved.name,
+      },
+    });
+    return;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        message: "Validation failed",
+        errors: error.errors,
+      });
+      return;
+    }
+
+    console.error("Signup error:", error);
+    res.status(500).json({
+      message: "Incorrect Inputs",
+    });
+    return;
+  }
 });
 
 app.post("/signin", async (req: Request, res: Response) => {
@@ -73,9 +77,9 @@ app.post("/signin", async (req: Request, res: Response) => {
     });
 
     if (!user) {
-       res.status(401).json({
-         message: "Invalid username or password",
-       });
+      res.status(401).json({
+        message: "Invalid username or password",
+      });
       return;
     }
 
@@ -85,25 +89,24 @@ app.post("/signin", async (req: Request, res: Response) => {
     );
 
     if (!isPasswordValid) {
-        res.status(401).json({
+      res.status(401).json({
         message: "Invalid username or password",
       });
       return;
-
     }
 
     // TODO: Generate and send JWT token here if using token-based auth
     const userId = user.id;
-    const token = await jwt.sign({userId},JWT_SECRET);
+    const token = await jwt.sign({ userId }, JWT_SECRET);
 
     res.status(200).json({
       message: "Signin successful",
-      token
+      token,
     });
-      return;
+    return;
   } catch (error) {
     if (error instanceof z.ZodError) {
-        res.status(400).json({
+      res.status(400).json({
         message: "Validation failed",
         errors: error.errors,
       });
@@ -114,16 +117,47 @@ app.post("/signin", async (req: Request, res: Response) => {
     res.status(500).json({
       message: "Internal server error",
     });
-      return;
-
+    return;
   }
 });
 
-app.post('/room', middleware ,(req, res) => {
+app.post("/room", middleware, async (req, res) => {
+  try {
+    // Validate request body
+    const parsedData = CreateRoomSchema.parse(req.body);
 
-    //db call
-    res.json({roomId: 123});
-    return;
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    // Check if room already exists (better error handling)
+    const existingRoom = await prismaClient.room.findUnique({
+      where: { slug: parsedData.name },
+    });
+
+    if (existingRoom) {
+      res.status(409).json({ message: "Room already exists with this name" });
+      return;
+    }
+
+    // Create a new room
+    const room = await prismaClient.room.create({
+      data: {
+        slug: parsedData.name,
+        adminId: userId,
+      },
+    });
+
+    res.json({ roomId: room.id });
+  } catch (e) {
+    if (e instanceof ZodError) {
+      res.status(400).json({ message: "Invalid Inputs", errors: e.errors });
+      return;
+    }
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
 app.listen(3001);
