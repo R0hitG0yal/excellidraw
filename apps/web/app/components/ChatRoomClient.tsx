@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import { useSocket } from "../../hooks/useSocket";
 
 export function ChatRoomClient({
   messages,
   id,
 }: {
-  messages: { message: string }[];
+  messages: {
+    [x: string]: Key | null | undefined;
+    message: string;
+  }[];
   id: string;
 }) {
   const [chats, setChats] = useState(messages);
@@ -34,7 +37,7 @@ export function ChatRoomClient({
   return (
     <div>
       {chats.map((message) => {
-        return <div>{message.message}</div>;
+        return <div key={message.id}>{message.message}</div>;
       })}
       <input
         type="text"
