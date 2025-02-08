@@ -60,7 +60,7 @@ export class AuthService {
 
       if (response.data.token) {
         this.setToken(response.data.token);
-        window.location.href = "/room";
+        window.location.href = "/dashboard";
       } else {
         throw new Error("No token received");
       }
