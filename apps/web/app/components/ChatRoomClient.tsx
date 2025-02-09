@@ -2,6 +2,7 @@
 import { Key, useEffect, useState, useRef } from "react";
 import { useSocket } from "../../hooks/useSocket";
 import { Send, Loader } from "lucide-react";
+import { Button } from "@repo/ui/button";
 
 export function ChatRoomClient({
   messages,
@@ -44,6 +45,20 @@ export function ChatRoomClient({
     }
   }, [socket, loading, id]);
 
+  const handleLeaveRoom = () => {
+    socket?.send(
+      JSON.stringify({
+        type: "leave-room",
+        roomId: id,
+      })
+    );
+
+    socket?.close();
+
+    // Redirect to dashboard
+    window.location.href = "http://localhost:3002/dashboard";
+  };
+
   const handleSendMessage = () => {
     if (currentMessage.trim() === "") return;
 
@@ -69,18 +84,26 @@ export function ChatRoomClient({
     <div className="flex flex-col h-screen max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
       {/* Chat Header */}
       <div className="bg-indigo-600 px-6 py-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-white">Chat Room</h2>
-        {loading ? (
-          <div className="flex items-center gap-2 text-white">
-            <Loader className="w-4 h-4 animate-spin" />
-            <span className="text-sm">Connecting...</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-white">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span className="text-sm">Connected</span>
-          </div>
-        )}
+        <div>
+          <h2 className="text-xl font-semibold text-white">Chat Room</h2>
+          {loading ? (
+            <div className="flex items-center gap-2 text-white">
+              <Loader className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Connecting...</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-white">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span className="text-sm">Connected</span>
+            </div>
+          )}
+        </div>
+        <Button
+          onClick={handleLeaveRoom}
+          className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          Leave Room
+        </Button>
       </div>
 
       {/* Messages Container */}
