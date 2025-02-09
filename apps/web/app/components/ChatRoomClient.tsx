@@ -66,7 +66,7 @@ export function ChatRoomClient({
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <div className="flex flex-col h-screen max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
       {/* Chat Header */}
       <div className="bg-indigo-600 px-6 py-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-white">Chat Room</h2>
