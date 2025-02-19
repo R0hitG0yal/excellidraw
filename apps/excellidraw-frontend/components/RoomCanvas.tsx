@@ -1,14 +1,15 @@
 "use client";
 import { WS_URL } from "@/config";
-import { initDraw } from "@/draw";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Canvas } from "./Canvas";
+import Cookies from "js-cookie";
 
 export function RoomCanvas({ roomId }: { roomId: string }) {
     const [socket, setSocket] = useState<WebSocket | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket(`${WS_URL}?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MmRiYWQ5Yy01NDUyLTRjODgtOTU3Ni01MTdkN2ZkZjUxNzAiLCJpYXQiOjE3MzkyNTg3NTl9.vPet6j2MxcfIMqvz_0i356xNzHNtcaMzoBbJfvV4gUY`);
+        const token = Cookies.get("token");
+        const ws = new WebSocket(`${WS_URL}?token=${token}`);
 
         ws.onopen = () => {
             setSocket(ws);
@@ -19,8 +20,6 @@ export function RoomCanvas({ roomId }: { roomId: string }) {
             }))
         }
     }, []);
-
-
 
     if (!socket)
         return <div>
